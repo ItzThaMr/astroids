@@ -7,7 +7,7 @@ def main():
     print(f"Screen height: {SCREEN_HEIGHT}")
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    fps = pygame.time.Clock()
+    clock = pygame.time.Clock()
     dt = 0
 
 
@@ -17,12 +17,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        dt = fps.tick(60) / 1000
+        
+        # limits the framerate to 60fps
+        dt = clock.tick(60) / 1000
             
         screen.fill(("black"))
         pygame.display.flip()
 
-
+class CircleShape(Sprite):
+    
 
 
 
