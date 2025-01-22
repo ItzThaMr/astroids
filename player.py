@@ -11,11 +11,11 @@ class Player(CircleShape):
         self.image = pygame.Surface((size, size), pygame.SRCALPHA)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self._draw_triangle()  # Draw initial triangle
+        self.draw(screen)  # Draw initial triangle
 
     def _get_triangle_points(self):
-        # Calculate points relative to center of surface
-        center = pygame.Vector2(self.radius, self.radius)
+        # Calculate points relative to actual position
+        center = self.position
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
         
@@ -24,19 +24,13 @@ class Player(CircleShape):
         c = center - forward * self.radius + right
         return [a, b, c]
     
-    def _draw_triangle(self):
-        self.image.fill((0,0,0,0))  # Clear with transparency
-        points = self._get_triangle_points()
-        pygame.draw.polygon(self.image, "white", points, 2)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
-        self._draw_triangle()  # Redraw triangle after rotation
 
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
-        self.rect.center = self.position
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
@@ -54,3 +48,7 @@ class Player(CircleShape):
         if keys[pygame.K_d]:
             print("D pressed")  # Debug print
             self.rotate(-dt)
+
+    def draw(self, screen):
+        points = self._get_triangle_points()
+        pygame.draw.polygon(screen, "white", points, 2)  # Added width=2 to match asteroid style
