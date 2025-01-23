@@ -11,7 +11,7 @@ class Player(CircleShape):
         self.image = pygame.Surface((size, size), pygame.SRCALPHA)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.draw(screen)  # Draw initial triangle
+        self._update_image()  # Draw initial triangle
 
     def _get_triangle_points(self):
         # Calculate points relative to actual position
@@ -23,7 +23,19 @@ class Player(CircleShape):
         b = center - forward * self.radius - right
         c = center - forward * self.radius + right
         return [a, b, c]
-    
+
+    def _update_image(self):
+        # Clear the surface
+        self.image.fill((0, 0, 0, 0))
+        # Convert points to be relative to surface
+        relative_points = [point - self.position + pygame.Vector2(self.radius, self.radius) for point in self._get_triangle_points()]
+        # Draw to self.image
+        pygame.draw.polygon(self.image, "white", relative_points, 2)
+
+    def draw(self, screen):
+        # Update rectangle position to match actual position
+        self.rect.center = self.position
+        screen.blit(self.image, self.rect)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -34,21 +46,12 @@ class Player(CircleShape):
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
-        print(f"Update called, dt: {dt}")  # Debug print
-
         if keys[pygame.K_w]:
-            print("W pressed")  # Debug print
             self.move(dt)
         if keys[pygame.K_s]:
-            print("S pressed")  # Debug print
             self.move(-dt)
-        if keys[pygame.K_a]:
-            print("A pressed")  # Debug print
-            self.rotate(dt)
         if keys[pygame.K_d]:
-            print("D pressed")  # Debug print
+            self.rotate(dt)
+        if keys[pygame.K_a]:
             self.rotate(-dt)
-
-    def draw(self, screen):
-        points = self._get_triangle_points()
-        pygame.draw.polygon(screen, "white", points, 2)  # Added width=2 to match asteroid style
+        self._update_image()
